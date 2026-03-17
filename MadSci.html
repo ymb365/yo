@@ -1,0 +1,1123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mad Science - Ultimate Science Quiz</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --neon-green: #39ff14;
+            --neon-blue: #00d9ff;
+            --neon-pink: #ff006e;
+            --neon-purple: #b53fff;
+            --dark-bg: #0a0e27;
+            --card-bg: #ffffff;
+            --text-dark: #1a1a2e;
+            --success: #06ffa5;
+            --error: #ff4d6d;
+        }
+
+        .dark {
+            --card-bg: #1a1a2e;
+            --text-dark: #ffffff;
+            --dark-bg: #000000;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: var(--dark-bg);
+            color: var(--text-dark);
+            font-family: 'Space Grotesk', sans-serif;
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Animated background */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            background:
+                radial-gradient(circle at 20% 50%, rgba(57, 255, 20, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(0, 217, 255, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 40% 20%, rgba(181, 63, 255, 0.15) 0%, transparent 50%);
+            animation: bgShift 15s ease-in-out infinite;
+        }
+
+        @keyframes bgShift {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .container {
+            max-width: 900px;
+            width: 100%;
+            background: var(--card-bg);
+            border-radius: 25px;
+            box-shadow: 0 20px 60px rgba(0, 217, 255, 0.3);
+            padding: 40px;
+            position: relative;
+            z-index: 1;
+            border: 2px solid rgba(0, 217, 255, 0.2);
+        }
+
+        .dark .container {
+            box-shadow: 0 20px 60px rgba(57, 255, 20, 0.3);
+            border: 2px solid rgba(57, 255, 20, 0.2);
+        }
+
+        .science-title {
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .science-title h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 4rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple), var(--neon-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 30px rgba(0, 217, 255, 0.5);
+            margin-bottom: 10px;
+            letter-spacing: 3px;
+            animation: glowPulse 3s ease-in-out infinite;
+        }
+
+        @keyframes glowPulse {
+            0%, 100% { filter: brightness(1); }
+            50% { filter: brightness(1.3); }
+        }
+
+        .science-title p {
+            color: var(--text-dark);
+            font-size: 1.2rem;
+            opacity: 0.8;
+        }
+
+        .science-symbols {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.03;
+        }
+
+        .science-symbol {
+            position: absolute;
+            font-size: 2.5rem;
+            color: var(--neon-blue);
+            animation: float 20s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            33% { transform: translateY(-20px) rotate(120deg); }
+            66% { transform: translateY(10px) rotate(240deg); }
+        }
+
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+            padding: 25px;
+            background: linear-gradient(135deg, rgba(0, 217, 255, 0.05), rgba(181, 63, 255, 0.05));
+            border-radius: 20px;
+            border: 1px solid rgba(0, 217, 255, 0.2);
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 700;
+            color: var(--text-dark);
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        select, input {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid rgba(0, 217, 255, 0.3);
+            border-radius: 12px;
+            font-size: 16px;
+            font-family: 'Space Grotesk', sans-serif;
+            background: var(--card-bg);
+            color: var(--text-dark);
+            transition: all 0.3s;
+        }
+
+        select:focus, input:focus {
+            border-color: var(--neon-blue);
+            outline: none;
+            box-shadow: 0 0 15px rgba(0, 217, 255, 0.3);
+        }
+
+        button {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 700;
+            font-family: 'Orbitron', sans-serif;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        button:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0, 217, 255, 0.4);
+        }
+
+        #generate-btn {
+            background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple));
+            color: white;
+            margin-top: 10px;
+        }
+
+        .madness-warning {
+            background: linear-gradient(135deg, #ff006e, #8b00ff);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.1rem;
+            box-shadow: 0 8px 25px rgba(255, 0, 110, 0.4);
+            animation: warningPulse 2s ease-in-out infinite;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        @keyframes warningPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+
+        .quiz-container {
+            margin-top: 30px;
+        }
+
+        .question {
+            background: linear-gradient(135deg, rgba(0, 217, 255, 0.05), rgba(181, 63, 255, 0.05));
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 25px;
+            border-left: 5px solid var(--neon-blue);
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .question::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .question:hover::before {
+            left: 100%;
+        }
+
+        .question.madness {
+            border-left: 5px solid var(--neon-pink);
+            background: linear-gradient(135deg, rgba(255, 0, 110, 0.1), rgba(139, 0, 255, 0.1));
+            box-shadow: 0 8px 25px rgba(255, 0, 110, 0.2);
+        }
+
+        .question:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 30px rgba(0, 217, 255, 0.2);
+        }
+
+        .question-number {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            color: var(--neon-blue);
+            margin-bottom: 12px;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .question-number.madness {
+            color: var(--neon-pink);
+            text-shadow: 0 0 10px rgba(255, 0, 110, 0.5);
+        }
+
+        .question-text {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            font-weight: 600;
+            color: var(--text-dark);
+            line-height: 1.5;
+        }
+
+        .category-badge {
+            display: inline-block;
+            padding: 6px 14px;
+            background: var(--neon-blue);
+            color: white;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .category-badge.physics { background: linear-gradient(135deg, #667eea, #764ba2); }
+        .category-badge.chemistry { background: linear-gradient(135deg, #f093fb, #f5576c); }
+        .category-badge.biology { background: linear-gradient(135deg, #4facfe, #00f2fe); }
+        .category-badge.astronomy { background: linear-gradient(135deg, #fa709a, #fee140); }
+        .category-badge.earth { background: linear-gradient(135deg, #30cfd0, #330867); }
+
+        .options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        @media (max-width: 600px) {
+            .options {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .option {
+            padding: 18px;
+            background: var(--card-bg);
+            border: 2px solid rgba(0, 217, 255, 0.3);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            font-weight: 600;
+            font-size: 1.05rem;
+            color: var(--text-dark);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .option::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(0, 217, 255, 0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.4s, height 0.4s;
+        }
+
+        .option:hover::before {
+            width: 200%;
+            height: 200%;
+        }
+
+        .option:hover {
+            border-color: var(--neon-blue);
+            transform: scale(1.05);
+            box-shadow: 0 5px 20px rgba(0, 217, 255, 0.3);
+        }
+
+        .option.selected {
+            background: linear-gradient(135deg, rgba(0, 217, 255, 0.2), rgba(181, 63, 255, 0.2));
+            border-color: var(--neon-blue);
+            box-shadow: 0 0 20px rgba(0, 217, 255, 0.4);
+        }
+
+        .option.correct {
+            background: linear-gradient(135deg, rgba(6, 255, 165, 0.3), rgba(57, 255, 20, 0.3));
+            border-color: var(--success);
+            color: #004d00;
+            font-weight: 700;
+        }
+
+        .dark .option.correct {
+            color: var(--success);
+        }
+
+        .option.incorrect {
+            background: linear-gradient(135deg, rgba(255, 77, 109, 0.3), rgba(255, 0, 110, 0.3));
+            border-color: var(--error);
+            color: #660000;
+            font-weight: 700;
+        }
+
+        .dark .option.incorrect {
+            color: var(--error);
+        }
+
+        .feedback {
+            margin-top: 18px;
+            padding: 15px;
+            border-radius: 12px;
+            display: none;
+            font-weight: 600;
+            text-align: center;
+            font-size: 1.05rem;
+        }
+
+        .feedback.correct {
+            background: linear-gradient(135deg, rgba(6, 255, 165, 0.2), rgba(57, 255, 20, 0.2));
+            color: var(--success);
+            border: 2px solid var(--success);
+            display: block;
+            animation: popIn 0.5s;
+        }
+
+        .feedback.incorrect {
+            background: linear-gradient(135deg, rgba(255, 77, 109, 0.2), rgba(255, 0, 110, 0.2));
+            color: var(--error);
+            border: 2px solid var(--error);
+            display: block;
+            animation: shake 0.5s;
+        }
+
+        .score-container {
+            text-align: center;
+            margin-top: 40px;
+            padding: 35px;
+            background: linear-gradient(135deg, rgba(0, 217, 255, 0.1), rgba(181, 63, 255, 0.1));
+            border-radius: 20px;
+            border: 2px solid rgba(0, 217, 255, 0.3);
+            box-shadow: 0 10px 30px rgba(0, 217, 255, 0.2);
+            display: none;
+            animation: fadeIn 1s;
+        }
+
+        .score {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 3.5rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin: 20px 0;
+        }
+
+        .score-message {
+            font-size: 1.4rem;
+            margin-bottom: 25px;
+            color: var(--text-dark);
+            font-weight: 700;
+        }
+
+        .timer {
+            text-align: center;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--neon-pink);
+            margin-bottom: 20px;
+            padding: 12px;
+            background: linear-gradient(135deg, rgba(255, 0, 110, 0.1), rgba(139, 0, 255, 0.1));
+            border-radius: 12px;
+            border: 2px solid rgba(255, 0, 110, 0.3);
+        }
+
+        #submit-btn {
+            background: linear-gradient(135deg, var(--neon-pink), var(--neon-purple));
+            color: white;
+            margin-top: 30px;
+        }
+
+        #reset-btn {
+            background: linear-gradient(135deg, var(--neon-blue), var(--neon-green));
+            color: white;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        /* Animations */
+        @keyframes popIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            50% { transform: translateX(10px); }
+            75% { transform: translateX(-5px); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .science-title h1 {
+                font-size: 2.5rem;
+            }
+
+            .container {
+                padding: 25px;
+            }
+
+            .controls {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-animation"></div>
+
+    <div class="container">
+        <div class="science-symbols" id="science-symbols"></div>
+
+        <header class="science-title">
+            <h1>MAD SCIENCE</h1>
+            <p>🧪 Explore the Universe of Knowledge 🔬</p>
+            <div class="timer" id="timer">⏱️ Time: <span id="time">0</span>s</div>
+        </header>
+
+        <div class="controls">
+            <div class="control-group">
+                <label for="quiz-type">🔬 Science Category</label>
+                <select id="quiz-type">
+                    <option value="physics">⚡ Physics</option>
+                    <option value="chemistry">🧪 Chemistry</option>
+                    <option value="biology">🧬 Biology</option>
+                    <option value="astronomy">🌌 Astronomy</option>
+                    <option value="earth">🌍 Earth Science</option>
+                    <option value="mixed">🌀 Mixed Madness</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label for="difficulty">⚡ Difficulty Level</label>
+                <select id="difficulty">
+                    <option value="easy">🟢 Easy</option>
+                    <option value="medium" selected>🟡 Medium</option>
+                    <option value="hard">🔴 Hard</option>
+                    <option value="madness">💀 GENIUS MODE</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label for="question-count">📊 Questions</label>
+                <input type="number" id="question-count" min="1" max="20" value="5">
+            </div>
+        </div>
+
+        <div id="madness-warning" class="madness-warning" style="display: none;">
+            ⚠️ GENIUS MODE ACTIVATED! ⚠️<br>
+            💀 Prepare for questions that would challenge Einstein, Curie, and Hawking! 💀<br>
+            🧠 Only true science masters dare enter... 🧠
+        </div>
+
+        <button id="generate-btn">🚀 Generate Science Quiz!</button>
+
+        <div class="quiz-container" id="quiz-container"></div>
+
+        <div class="score-container" id="score-container">
+            <h2>🎓 Science Results!</h2>
+            <p class="score-message" id="score-message">You're a science genius!</p>
+            <p class="score">Score: <span id="score">0</span>/<span id="total">0</span></p>
+            <p id="time-result">⏱️ Time: <span id="final-time">0</span> seconds</p>
+            <button id="reset-btn">🔄 Try Another Quiz!</button>
+        </div>
+    </div>
+
+    <script>
+        // Dark mode detection
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.documentElement.classList.add('dark');
+        }
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+            if (event.matches) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        });
+
+        // DOM Elements
+        const generateBtn = document.getElementById('generate-btn');
+        const quizContainer = document.getElementById('quiz-container');
+        const scoreContainer = document.getElementById('score-container');
+        const scoreElement = document.getElementById('score');
+        const totalElement = document.getElementById('total');
+        const resetBtn = document.getElementById('reset-btn');
+        const timerElement = document.getElementById('time');
+        const finalTimeElement = document.getElementById('final-time');
+        const scoreMessageElement = document.getElementById('score-message');
+        const scienceSymbolsContainer = document.getElementById('science-symbols');
+        const madnessWarning = document.getElementById('madness-warning');
+        const difficultySelect = document.getElementById('difficulty');
+
+        // Quiz state
+        let currentQuiz = [];
+        let userAnswers = [];
+        let quizCompleted = false;
+        let startTime;
+        let timerInterval;
+        let usedQuestions = new Set();
+
+        // Science symbols for background
+        const scienceSymbols = ['⚛️', '🧬', '🔬', '🧪', '⚗️', '🌡️', '⚡', '🔭', '🌌', '💫', '🌍', '🔥', '💧', '🌊', '☢️', '⚙️', '🧲', '💡'];
+
+        // Show/hide madness warning
+        difficultySelect.addEventListener('change', function() {
+            if (this.value === 'madness') {
+                madnessWarning.style.display = 'block';
+            } else {
+                madnessWarning.style.display = 'none';
+            }
+        });
+
+        // Create floating science symbols
+        function createScienceSymbols() {
+            scienceSymbolsContainer.innerHTML = '';
+            for (let i = 0; i < 20; i++) {
+                const symbol = document.createElement('div');
+                symbol.className = 'science-symbol';
+                symbol.textContent = scienceSymbols[Math.floor(Math.random() * scienceSymbols.length)];
+                symbol.style.left = `${Math.random() * 100}%`;
+                symbol.style.top = `${Math.random() * 100}%`;
+                symbol.style.animationDelay = `${Math.random() * 5}s`;
+                scienceSymbolsContainer.appendChild(symbol);
+            }
+        }
+
+        // Timer functions
+        function startTimer() {
+            startTime = new Date();
+            timerInterval = setInterval(() => {
+                const currentTime = new Date();
+                const elapsed = Math.floor((currentTime - startTime) / 1000);
+                timerElement.textContent = elapsed;
+            }, 1000);
+        }
+
+        function stopTimer() {
+            clearInterval(timerInterval);
+            const endTime = new Date();
+            const totalTime = Math.floor((endTime - startTime) / 1000);
+            finalTimeElement.textContent = totalTime;
+            return totalTime;
+        }
+
+        // Event Listeners
+        generateBtn.addEventListener('click', generateQuiz);
+        resetBtn.addEventListener('click', resetQuiz);
+
+        // Generate quiz
+        function generateQuiz() {
+            const quizType = document.getElementById('quiz-type').value;
+            const difficulty = document.getElementById('difficulty').value;
+            const questionCount = parseInt(document.getElementById('question-count').value);
+
+            currentQuiz = [];
+            userAnswers = [];
+            quizCompleted = false;
+            usedQuestions.clear();
+
+            for (let i = 0; i < questionCount; i++) {
+                let question;
+                let attempts = 0;
+                const maxAttempts = 50;
+
+                do {
+                    if (difficulty === 'madness') {
+                        question = generateGeniusQuestion(quizType);
+                    } else {
+                        if (quizType === 'mixed') {
+                            const types = ['physics', 'chemistry', 'biology', 'astronomy', 'earth'];
+                            const randomType = types[Math.floor(Math.random() * types.length)];
+                            question = generateQuestionByType(randomType, difficulty);
+                        } else {
+                            question = generateQuestionByType(quizType, difficulty);
+                        }
+                    }
+                    attempts++;
+                } while (usedQuestions.has(question.question) && attempts < maxAttempts);
+
+                usedQuestions.add(question.question);
+                currentQuiz.push(question);
+            }
+
+            displayQuiz();
+            startTimer();
+            scoreContainer.style.display = 'none';
+        }
+
+        // Generate question by type
+        function generateQuestionByType(type, difficulty) {
+            switch(type) {
+                case 'physics':
+                    return generatePhysicsQuestion(difficulty);
+                case 'chemistry':
+                    return generateChemistryQuestion(difficulty);
+                case 'biology':
+                    return generateBiologyQuestion(difficulty);
+                case 'astronomy':
+                    return generateAstronomyQuestion(difficulty);
+                case 'earth':
+                    return generateEarthScienceQuestion(difficulty);
+                default:
+                    return generatePhysicsQuestion(difficulty);
+            }
+        }
+
+        // Physics questions
+        function generatePhysicsQuestion(difficulty) {
+            const questions = {
+                easy: [
+                    { q: 'What is the unit of force?', a: 'Newton', opts: ['Joule', 'Watt', 'Pascal'] },
+                    { q: 'What does "E" represent in E=mc²?', a: 'Energy', opts: ['Electricity', 'Electron', 'Element'] },
+                    { q: 'What is the speed of light approximately?', a: '300,000 km/s', opts: ['150,000 km/s', '500,000 km/s', '200,000 km/s'] },
+                    { q: 'What force keeps us on the ground?', a: 'Gravity', opts: ['Magnetism', 'Friction', 'Tension'] },
+                    { q: 'What is the unit of electrical resistance?', a: 'Ohm', opts: ['Volt', 'Ampere', 'Coulomb'] }
+                ],
+                medium: [
+                    { q: 'What is the formula for kinetic energy?', a: '½mv²', opts: ['mgh', 'mv', 'ma'] },
+                    { q: 'What particle has no electric charge?', a: 'Neutron', opts: ['Proton', 'Electron', 'Positron'] },
+                    { q: 'At what temperature does water boil (°C at sea level)?', a: '100°C', opts: ['90°C', '110°C', '120°C'] },
+                    { q: 'What is the first law of thermodynamics about?', a: 'Energy conservation', opts: ['Entropy', 'Heat death', 'Absolute zero'] },
+                    { q: 'What is the unit of power?', a: 'Watt', opts: ['Joule', 'Newton', 'Pascal'] }
+                ],
+                hard: [
+                    { q: 'What is the Planck constant approximately?', a: '6.626 × 10⁻³⁴ J·s', opts: ['9.109 × 10⁻³¹ J·s', '1.602 × 10⁻¹⁹ J·s', '3.14 × 10⁻³⁴ J·s'] },
+                    { q: 'What phenomenon is explained by wave-particle duality?', a: 'Double-slit experiment', opts: ['Photoelectric effect only', 'Diffraction only', 'Interference only'] },
+                    { q: 'What is the angular momentum of a photon?', a: 'ℏ (h-bar)', opts: ['h', '0', '2ℏ'] },
+                    { q: 'What is the escape velocity from Earth (approx)?', a: '11.2 km/s', opts: ['9.8 km/s', '15.5 km/s', '7.9 km/s'] },
+                    { q: 'What principle states you cannot know position and momentum simultaneously?', a: 'Heisenberg Uncertainty Principle', opts: ['Pauli Exclusion Principle', 'Aufbau Principle', 'Hund\'s Rule'] }
+                ]
+            };
+
+            const levelQuestions = questions[difficulty];
+            const q = levelQuestions[Math.floor(Math.random() * levelQuestions.length)];
+            const options = [q.a, ...q.opts];
+
+            return {
+                type: 'physics',
+                category: 'Physics',
+                question: q.q,
+                correctAnswer: q.a,
+                options: shuffleArray(options)
+            };
+        }
+
+        // Chemistry questions
+        function generateChemistryQuestion(difficulty) {
+            const questions = {
+                easy: [
+                    { q: 'What is the chemical symbol for gold?', a: 'Au', opts: ['Go', 'Gd', 'Ag'] },
+                    { q: 'How many elements are in water (H₂O)?', a: '2', opts: ['1', '3', '4'] },
+                    { q: 'What is the pH of a neutral solution?', a: '7', opts: ['0', '14', '10'] },
+                    { q: 'What gas do plants absorb from the atmosphere?', a: 'CO₂', opts: ['O₂', 'N₂', 'H₂'] },
+                    { q: 'What is the most abundant element in the universe?', a: 'Hydrogen', opts: ['Helium', 'Oxygen', 'Carbon'] }
+                ],
+                medium: [
+                    { q: 'What is the atomic number of Carbon?', a: '6', opts: ['8', '12', '4'] },
+                    { q: 'What type of bond involves electron sharing?', a: 'Covalent', opts: ['Ionic', 'Metallic', 'Hydrogen'] },
+                    { q: 'What is Avogadro\'s number approximately?', a: '6.022 × 10²³', opts: ['3.14 × 10²³', '9.81 × 10²³', '1.602 × 10²³'] },
+                    { q: 'What is the noble gas with atomic number 10?', a: 'Neon', opts: ['Argon', 'Helium', 'Krypton'] },
+                    { q: 'What process converts solid directly to gas?', a: 'Sublimation', opts: ['Evaporation', 'Condensation', 'Deposition'] }
+                ],
+                hard: [
+                    { q: 'What is the electron configuration of Iron (Fe)?', a: '[Ar] 3d⁶ 4s²', opts: ['[Ar] 3d⁸', '[Ar] 4s² 3d⁶', '[Kr] 3d⁶'] },
+                    { q: 'What catalyst is used in the Haber process?', a: 'Iron', opts: ['Platinum', 'Nickel', 'Copper'] },
+                    { q: 'What is the strongest type of intermolecular force?', a: 'Hydrogen bonding', opts: ['Van der Waals', 'Dipole-dipole', 'London dispersion'] },
+                    { q: 'What quantum number describes orbital shape?', a: 'Azimuthal (l)', opts: ['Principal (n)', 'Magnetic (m)', 'Spin (s)'] },
+                    { q: 'What is the oxidation state of Mn in KMnO₄?', a: '+7', opts: ['+5', '+6', '+4'] }
+                ]
+            };
+
+            const levelQuestions = questions[difficulty];
+            const q = levelQuestions[Math.floor(Math.random() * levelQuestions.length)];
+            const options = [q.a, ...q.opts];
+
+            return {
+                type: 'chemistry',
+                category: 'Chemistry',
+                question: q.q,
+                correctAnswer: q.a,
+                options: shuffleArray(options)
+            };
+        }
+
+        // Biology questions
+        function generateBiologyQuestion(difficulty) {
+            const questions = {
+                easy: [
+                    { q: 'What is the powerhouse of the cell?', a: 'Mitochondria', opts: ['Nucleus', 'Ribosome', 'Chloroplast'] },
+                    { q: 'What molecule carries genetic information?', a: 'DNA', opts: ['RNA', 'Protein', 'Lipid'] },
+                    { q: 'How many chambers does the human heart have?', a: '4', opts: ['2', '3', '5'] },
+                    { q: 'What is the largest organ in the human body?', a: 'Skin', opts: ['Liver', 'Brain', 'Lungs'] },
+                    { q: 'What type of blood cell fights infection?', a: 'White blood cell', opts: ['Red blood cell', 'Platelet', 'Plasma cell'] }
+                ],
+                medium: [
+                    { q: 'What process do plants use to make food?', a: 'Photosynthesis', opts: ['Respiration', 'Transpiration', 'Fermentation'] },
+                    { q: 'How many pairs of chromosomes do humans have?', a: '23', opts: ['22', '24', '46'] },
+                    { q: 'What is the basic unit of life?', a: 'Cell', opts: ['Atom', 'Molecule', 'Tissue'] },
+                    { q: 'What organelle performs protein synthesis?', a: 'Ribosome', opts: ['Mitochondria', 'Golgi apparatus', 'Lysosome'] },
+                    { q: 'What is the scientific name for humans?', a: 'Homo sapiens', opts: ['Homo erectus', 'Homo habilis', 'Homo neanderthalensis'] }
+                ],
+                hard: [
+                    { q: 'What is the role of telomeres?', a: 'Protect chromosome ends', opts: ['Code for proteins', 'Control cell division', 'Store energy'] },
+                    { q: 'What enzyme unwinds DNA during replication?', a: 'Helicase', opts: ['Polymerase', 'Ligase', 'Primase'] },
+                    { q: 'What is the Krebs cycle also known as?', a: 'Citric acid cycle', opts: ['Calvin cycle', 'Urea cycle', 'Glycolysis'] },
+                    { q: 'How many ATP molecules are produced in aerobic respiration?', a: 'About 36-38', opts: ['2', '10-12', '50-60'] },
+                    { q: 'What is the function of the Golgi apparatus?', a: 'Modify and package proteins', opts: ['Synthesize proteins', 'Store DNA', 'Produce ATP'] }
+                ]
+            };
+
+            const levelQuestions = questions[difficulty];
+            const q = levelQuestions[Math.floor(Math.random() * levelQuestions.length)];
+            const options = [q.a, ...q.opts];
+
+            return {
+                type: 'biology',
+                category: 'Biology',
+                question: q.q,
+                correctAnswer: q.a,
+                options: shuffleArray(options)
+            };
+        }
+
+        // Astronomy questions
+        function generateAstronomyQuestion(difficulty) {
+            const questions = {
+                easy: [
+                    { q: 'What is the closest star to Earth?', a: 'The Sun', opts: ['Proxima Centauri', 'Alpha Centauri', 'Sirius'] },
+                    { q: 'How many planets are in our solar system?', a: '8', opts: ['7', '9', '10'] },
+                    { q: 'What is the largest planet in our solar system?', a: 'Jupiter', opts: ['Saturn', 'Neptune', 'Uranus'] },
+                    { q: 'What galaxy do we live in?', a: 'Milky Way', opts: ['Andromeda', 'Triangulum', 'Whirlpool'] },
+                    { q: 'What causes day and night on Earth?', a: 'Earth\'s rotation', opts: ['Earth\'s orbit', 'Moon\'s orbit', 'Sun\'s movement'] }
+                ],
+                medium: [
+                    { q: 'What is a light-year?', a: 'Distance light travels in a year', opts: ['Time for light to reach Earth', 'Age of a star', 'Brightness of a star'] },
+                    { q: 'What is the hottest planet in our solar system?', a: 'Venus', opts: ['Mercury', 'Mars', 'Jupiter'] },
+                    { q: 'What is the name of Mars\' largest moon?', a: 'Phobos', opts: ['Deimos', 'Titan', 'Europa'] },
+                    { q: 'What is a supernova?', a: 'Exploding star', opts: ['New star', 'Black hole', 'Asteroid collision'] },
+                    { q: 'How long does it take light from the Sun to reach Earth?', a: 'About 8 minutes', opts: ['1 minute', '30 minutes', '1 hour'] }
+                ],
+                hard: [
+                    { q: 'What is the Schwarzschild radius?', a: 'Event horizon of a black hole', opts: ['Distance to a star', 'Orbital radius', 'Gravitational wave amplitude'] },
+                    { q: 'What is cosmic microwave background radiation?', a: 'Remnant from Big Bang', opts: ['Stellar radiation', 'Galactic noise', 'Dark matter signal'] },
+                    { q: 'What is the Chandrasekhar limit?', a: '1.4 solar masses', opts: ['2.0 solar masses', '3.0 solar masses', '0.7 solar masses'] },
+                    { q: 'What phenomenon causes gravitational lensing?', a: 'Spacetime curvature', opts: ['Atmospheric refraction', 'Stellar aberration', 'Quantum tunneling'] },
+                    { q: 'What is the main component of dark matter thought to be?', a: 'WIMPs', opts: ['Neutrinos', 'Black holes', 'Photons'] }
+                ]
+            };
+
+            const levelQuestions = questions[difficulty];
+            const q = levelQuestions[Math.floor(Math.random() * levelQuestions.length)];
+            const options = [q.a, ...q.opts];
+
+            return {
+                type: 'astronomy',
+                category: 'Astronomy',
+                question: q.q,
+                correctAnswer: q.a,
+                options: shuffleArray(options)
+            };
+        }
+
+        // Earth Science questions
+        function generateEarthScienceQuestion(difficulty) {
+            const questions = {
+                easy: [
+                    { q: 'What are the three types of rocks?', a: 'Igneous, Sedimentary, Metamorphic', opts: ['Granite, Marble, Slate', 'Hard, Soft, Medium', 'Old, New, Ancient'] },
+                    { q: 'What causes earthquakes?', a: 'Tectonic plate movement', opts: ['Volcanic eruptions', 'Ocean currents', 'Wind erosion'] },
+                    { q: 'What is the outermost layer of Earth called?', a: 'Crust', opts: ['Mantle', 'Core', 'Lithosphere'] },
+                    { q: 'What percentage of Earth is covered by water?', a: 'About 71%', opts: ['50%', '85%', '60%'] },
+                    { q: 'What is the process of water turning into vapor?', a: 'Evaporation', opts: ['Condensation', 'Precipitation', 'Sublimation'] }
+                ],
+                medium: [
+                    { q: 'What scale measures earthquake magnitude?', a: 'Richter/Moment Magnitude', opts: ['Beaufort', 'Fujita', 'Saffir-Simpson'] },
+                    { q: 'What drives plate tectonics?', a: 'Convection currents in mantle', opts: ['Ocean currents', 'Gravitational pull', 'Magnetic fields'] },
+                    { q: 'What is the most abundant gas in Earth\'s atmosphere?', a: 'Nitrogen', opts: ['Oxygen', 'Carbon dioxide', 'Argon'] },
+                    { q: 'What type of rock is formed from cooled magma?', a: 'Igneous', opts: ['Sedimentary', 'Metamorphic', 'Clastic'] },
+                    { q: 'What is the hardest naturally occurring mineral?', a: 'Diamond', opts: ['Quartz', 'Corundum', 'Topaz'] }
+                ],
+                hard: [
+                    { q: 'What is the Mohorovičić discontinuity?', a: 'Boundary between crust and mantle', opts: ['Core-mantle boundary', 'Inner-outer core boundary', 'Lithosphere-asthenosphere boundary'] },
+                    { q: 'What causes the Coriolis effect?', a: 'Earth\'s rotation', opts: ['Ocean currents', 'Atmospheric pressure', 'Magnetic field'] },
+                    { q: 'What is the primary mineral in Earth\'s mantle?', a: 'Peridotite/Olivine', opts: ['Quartz', 'Feldspar', 'Mica'] },
+                    { q: 'What is isostasy?', a: 'Gravitational equilibrium of crust', opts: ['Plate movement', 'Volcanic activity', 'Erosion process'] },
+                    { q: 'What is the age of Earth approximately?', a: '4.54 billion years', opts: ['2 billion years', '10 billion years', '6 billion years'] }
+                ]
+            };
+
+            const levelQuestions = questions[difficulty];
+            const q = levelQuestions[Math.floor(Math.random() * levelQuestions.length)];
+            const options = [q.a, ...q.opts];
+
+            return {
+                type: 'earth',
+                category: 'Earth Science',
+                question: q.q,
+                correctAnswer: q.a,
+                options: shuffleArray(options)
+            };
+        }
+
+        // Genius mode questions
+        function generateGeniusQuestion(quizType) {
+            const geniusQuestions = [
+                // Physics Genius
+                { cat: 'physics', q: 'What is the fine-structure constant approximately?', a: '1/137', opts: ['1/100', '1/200', '1/300'], category: 'Physics' },
+                { cat: 'physics', q: 'What theorem relates symmetry to conservation laws?', a: 'Noether\'s theorem', opts: ['Goldstone theorem', 'CPT theorem', 'Fermat theorem'], category: 'Physics' },
+                { cat: 'physics', q: 'What is the solution to Schrödinger equation for hydrogen atom called?', a: 'Wave function ψ', opts: ['Probability density', 'Energy eigenstate', 'Momentum operator'], category: 'Physics' },
+
+                // Chemistry Genius
+                { cat: 'chemistry', q: 'What is the hybridization of carbon in benzene?', a: 'sp²', opts: ['sp', 'sp³', 'sp³d'] , category: 'Chemistry' },
+                { cat: 'chemistry', q: 'What principle explains why electrons fill orbitals singly first?', a: 'Hund\'s rule', opts: ['Pauli exclusion', 'Aufbau principle', 'Heisenberg principle'], category: 'Chemistry' },
+                { cat: 'chemistry', q: 'What is the IUPAC name for acetone?', a: 'Propanone', opts: ['Methanone', 'Butanone', 'Ethanone'], category: 'Chemistry' },
+
+                // Biology Genius
+                { cat: 'biology', q: 'What is the wobble hypothesis related to?', a: 'Codon-anticodon pairing', opts: ['DNA replication', 'Protein folding', 'Enzyme kinetics'], category: 'Biology' },
+                { cat: 'biology', q: 'What technique sequences entire genomes using fluorescent tags?', a: 'Sanger/Next-gen sequencing', opts: ['PCR', 'Gel electrophoresis', 'Southern blotting'], category: 'Biology' },
+                { cat: 'biology', q: 'What is the function of the enzyme telomerase?', a: 'Extends telomeres', opts: ['Repairs DNA breaks', 'Replicates DNA', 'Transcribes RNA'], category: 'Biology' },
+
+                // Astronomy Genius
+                { cat: 'astronomy', q: 'What is the Hubble constant approximately (km/s/Mpc)?', a: '67-74', opts: ['100-120', '40-50', '150-200'], category: 'Astronomy' },
+                { cat: 'astronomy', q: 'What particle is hypothesized to be the quantum of gravity?', a: 'Graviton', opts: ['Gluon', 'Photon', 'Higgs boson'], category: 'Astronomy' },
+                { cat: 'astronomy', q: 'What is the cosmic microwave background temperature?', a: '2.7 K', opts: ['5.0 K', '1.0 K', '10.0 K'], category: 'Astronomy' },
+
+                // Earth Science Genius
+                { cat: 'earth', q: 'What is the Gutenberg discontinuity?', a: 'Mantle-core boundary', opts: ['Crust-mantle boundary', 'Inner-outer core boundary', 'Lithosphere-asthenosphere boundary'], category: 'Earth Science' },
+                { cat: 'earth', q: 'What is the primary driver of Earth\'s magnetic field?', a: 'Dynamo effect in outer core', opts: ['Iron in crust', 'Solar wind', 'Mantle convection'], category: 'Earth Science' },
+                { cat: 'earth', q: 'What process creates new oceanic crust?', a: 'Seafloor spreading', opts: ['Subduction', 'Continental drift', 'Orogeny'], category: 'Earth Science' }
+            ];
+
+            let filteredQuestions = geniusQuestions;
+            if (quizType !== 'mixed') {
+                filteredQuestions = geniusQuestions.filter(q => q.cat === quizType);
+            }
+
+            const q = filteredQuestions[Math.floor(Math.random() * filteredQuestions.length)];
+            const options = [q.a, ...q.opts];
+
+            return {
+                type: 'madness',
+                category: q.category,
+                question: q.q,
+                correctAnswer: q.a,
+                options: shuffleArray(options)
+            };
+        }
+
+        // Shuffle array
+        function shuffleArray(array) {
+            const newArray = [...array];
+            for (let i = newArray.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+            }
+            return newArray;
+        }
+
+        // Display quiz
+        function displayQuiz() {
+            quizContainer.innerHTML = '';
+            const difficulty = document.getElementById('difficulty').value;
+
+            currentQuiz.forEach((question, index) => {
+                const questionElement = document.createElement('div');
+                questionElement.className = `question ${difficulty === 'madness' ? 'madness' : ''}`;
+                questionElement.innerHTML = `
+                    <span class="category-badge ${question.type}">${question.category}</span>
+                    <div class="question-number ${difficulty === 'madness' ? 'madness' : ''}">
+                        Question ${index + 1} ${difficulty === 'madness' ? '🧠💀' : ''}
+                    </div>
+                    <div class="question-text">${question.question}</div>
+                    <div class="options">
+                        ${question.options.map((option, optionIndex) => `
+                            <div class="option" data-question="${index}" data-option="${optionIndex}">
+                                ${option}
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div class="feedback" id="feedback-${index}"></div>
+                `;
+
+                quizContainer.appendChild(questionElement);
+            });
+
+            document.querySelectorAll('.option').forEach(option => {
+                option.addEventListener('click', selectOption);
+            });
+
+            const submitButton = document.createElement('button');
+            submitButton.textContent = difficulty === 'madness' ? '🧠 Submit Genius Quiz!' : '🚀 Submit Quiz!';
+            submitButton.id = 'submit-btn';
+            submitButton.addEventListener('click', submitQuiz);
+            quizContainer.appendChild(submitButton);
+        }
+
+        // Select option
+        function selectOption(event) {
+            if (quizCompleted) return;
+
+            const questionIndex = parseInt(event.target.dataset.question);
+            const optionIndex = parseInt(event.target.dataset.option);
+
+            userAnswers[questionIndex] = currentQuiz[questionIndex].options[optionIndex];
+
+            const questionElement = event.target.closest('.question');
+            questionElement.querySelectorAll('.option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+
+            event.target.classList.add('selected');
+
+            const feedbackElement = document.getElementById(`feedback-${questionIndex}`);
+            feedbackElement.className = 'feedback';
+            feedbackElement.textContent = '';
+        }
+
+        // Submit quiz
+        function submitQuiz() {
+            if (quizCompleted) return;
+
+            let score = 0;
+            const totalTime = stopTimer();
+            const difficulty = document.getElementById('difficulty').value;
+
+            currentQuiz.forEach((question, index) => {
+                const userAnswer = userAnswers[index];
+                const isCorrect = userAnswer === question.correctAnswer;
+
+                if (isCorrect) score++;
+
+                const feedbackElement = document.getElementById(`feedback-${index}`);
+                if (isCorrect) {
+                    feedbackElement.textContent = difficulty === 'madness' ? '🧠 Brilliant! Einstein-level thinking!' : '✅ Correct! Outstanding!';
+                    feedbackElement.className = 'feedback correct';
+                } else {
+                    feedbackElement.textContent = `❌ Incorrect. The correct answer is: ${question.correctAnswer}`;
+                    feedbackElement.className = 'feedback incorrect';
+                }
+
+                const questionElement = document.querySelector(`.option[data-question="${index}"]`).closest('.question');
+                questionElement.querySelectorAll('.option').forEach(option => {
+                    const optionValue = currentQuiz[index].options[parseInt(option.dataset.option)];
+                    option.classList.remove('correct', 'incorrect');
+
+                    if (optionValue === question.correctAnswer) {
+                        option.classList.add('correct');
+                    } else if (optionValue === userAnswer && !isCorrect) {
+                        option.classList.add('incorrect');
+                    }
+                });
+            });
+
+            const percentage = (score / currentQuiz.length) * 100;
+            let message;
+
+            if (difficulty === 'madness') {
+                if (percentage === 100) {
+                    message = "🏆 LEGENDARY! You've achieved Nobel Prize-level mastery!";
+                } else if (percentage >= 80) {
+                    message = "🎓 OUTSTANDING! You're approaching genius-level comprehension!";
+                } else if (percentage >= 60) {
+                    message = "📚 IMPRESSIVE! Even Einstein had to study hard!";
+                } else {
+                    message = "🔬 Keep exploring! Science is a journey of discovery!";
+                }
+            } else {
+                if (percentage === 100) {
+                    message = "🌟 PERFECT! You're a true science master!";
+                } else if (percentage >= 80) {
+                    message = "🎯 EXCELLENT! You really know your science!";
+                } else if (percentage >= 60) {
+                    message = "👍 GOOD JOB! Keep learning and exploring!";
+                } else {
+                    message = "💪 Keep trying! Science rewards curiosity!";
+                }
+            }
+
+            scoreMessageElement.textContent = message;
+            scoreElement.textContent = score;
+            totalElement.textContent = currentQuiz.length;
+            scoreContainer.style.display = 'block';
+
+            quizCompleted = true;
+        }
+
+        // Reset quiz
+        function resetQuiz() {
+            quizContainer.innerHTML = '';
+            scoreContainer.style.display = 'none';
+            timerElement.textContent = '0';
+            madnessWarning.style.display = 'none';
+        }
+
+        // Initialize
+        window.addEventListener('DOMContentLoaded', () => {
+            createScienceSymbols();
+            generateQuiz();
+        });
+    </script>
+</body>
+</html>
