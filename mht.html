@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Health Tracker</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="header">
+    <h1>My Health Tracker</h1>
+    <p class="subtitle">Track medicines, water, sleep, and daily health</p>
+  </header>
+
+  <main class="container">
+    <!-- Medicine Tracker -->
+    <section class="card" id="medicine">
+      <h2>Medicine Tracker</h2>
+
+      <div class="input-group">
+        <input type="text" id="medicineName" placeholder="Enter medicine name" />
+        <button onclick="addMedicine()">Add</button>
+      </div>
+
+      <ul id="medicineList"></ul>
+    </section>
+
+    <!-- Daily Health Tracker -->
+    <section class="card" id="daily">
+      <h2>Daily Health</h2>
+
+      <div class="health-item">
+        <label>Water (glasses):</label>
+        <input type="number" id="water" />
+      </div>
+
+      <div class="health-item">
+        <label>Sleep (hours):</label>
+        <input type="number" id="sleep" />
+      </div>
+
+      <div class="health-item">
+        <label>Steps:</label>
+        <input type="number" id="steps" />
+      </div>
+
+      <button onclick="saveHealthData()">Save Today</button>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
