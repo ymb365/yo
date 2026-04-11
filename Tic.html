@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Demon's Tic Tac Toe</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f8;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 2rem 1rem;
+    }
+    .container {
+      background: #ffffff;
+      border: 1px solid #ddd;
+      border-radius: 16px;
+      padding: 2rem;
+      text-align: center;
+      max-width: 480px;
+      width: 100%;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    }
+    h1 { color: #1a1a2e; font-size: 28px; font-weight: 700; margin-bottom: 0.3rem; }
+    .subtitle { color: #666; font-size: 14px; margin-bottom: 1.5rem; }
+    .difficulty-selector { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 1.5rem; }
+    .difficulty-btn {
+      padding: 10px; border: 1.5px solid #ccc; background: #fff;
+      border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600;
+      color: #333; transition: all 0.2s;
+    }
+    .difficulty-btn:hover { background: #f0f0f0; border-color: #aaa; }
+    .difficulty-btn.active { background: #e8f0fe; border-color: #4a7cff; color: #1a4fd8; }
+    .difficulty-btn.full-width { grid-column: 1 / -1; }
+    .status { font-size: 16px; font-weight: 600; margin: 1rem 0; min-height: 24px; color: #555; }
+    .status.player-win { color: #2e7d32; }
+    .status.ai-win { color: #c62828; }
+    .status.draw { color: #e65100; }
+    .board {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 8px; margin: 1rem 0; background: #e8eaf0;
+      padding: 10px; border-radius: 12px;
+    }
+    .cell {
+      width: 100%; aspect-ratio: 1; background: #ffffff;
+      border: 1.5px solid #ddd; border-radius: 10px;
+      font-size: 36px; font-weight: 700; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      color: #1a1a2e; transition: background 0.15s; user-select: none;
+    }
+    .cell:hover:not(.taken) { background: #f0f4ff; border-color: #aab; }
+    .cell.taken { cursor: not-allowed; }
+    .cell.x-cell { color: #1a4fd8; }
+    .cell.o-cell { color: #c62828; }
+    .cell.winning { background: #fff9c4; border-color: #f9a825; }
+    .button-group { display: flex; gap: 10px; justify-content: center; margin-top: 1.2rem; }
+    .btn {
+      padding: 10px 22px; border: 1.5px solid #ccc; background: #fff;
+      border-radius: 8px; cursor: pointer; font-size: 14px;
+      font-weight: 600; color: #333; transition: all 0.2s;
+    }
+    .btn:hover { background: #f0f0f0; border-color: #aaa; }
+    .btn:active { transform: scale(0.97); }
+    .btn.primary { background: #1a4fd8; color: #fff; border-color: #1a4fd8; }
+    .btn.primary:hover { background: #1440b8; }
+    .stats { display: flex; justify-content: space-around; margin-top: 1.5rem; padding-top: 1.2rem; border-top: 1px solid #eee; }
+    .stat { text-align: center; }
+    .stat-label { font-size: 11px; color: #888; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .stat-value { font-size: 24px; font-weight: 700; color: #1a1a2e; }
+    .difficulty-badge {
+      display: inline-block; font-size: 11px; font-weight: 600;
+      padding: 3px 10px; border-radius: 20px; margin-bottom: 0.5rem;
+      background: #e8f0fe; color: #1a4fd8;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Demon's Tic Tac Toe</h1>
+    <p class="subtitle">You are X &mdash; beat the demon if you can</p>
+
+    <div class="difficulty-selector">
+      <button class="difficulty-btn" onclick="selectDifficulty('easy', this)">Easy</button>
+      <button class="difficulty-btn" onclick="selectDifficulty('medium', this)">Medium</button>
+      <button class="difficulty-btn" onclick="selectDifficulty('hard', this)">Hard</button>
+      <button class="difficulty-btn" onclick="selectDifficulty('veryhard', this)">Very Hard</button>
+      <button class="difficulty-btn full-width" onclick="selectDifficulty('veryVeryHard', this)">Very Very Hard</button>
+    </div>
+
+    <div id="difficultyBadge" class="difficulty-badge" style="display:none;"></div>
+    <div class="status" id="status">Select a difficulty to start</div>
+
+    <div class="board" id="board">
+      <div class="cell" onclick="playerMove(0)"></div>
+      <div class="cell" onclick="playerMove(1)"></div>
+      <div class="cell" onclick="playerMove(2)"></div>
+      <div class="cell" onclick="playerMove(3)"></div>
+      <div class="cell" onclick="playerMove(4)"></div>
+      <div class="cell" onclick="playerMove(5)"></div>
+      <div class="cell" onclick="playerMove(6)"></div>
+      <div class="cell" onclick="playerMove(7)"></div>
+      <div class="cell" onclick="playerMove(8)"></div>
+    </div>
+
+    <div class="button-group">
+      <button class="btn primary" onclick="newGame()">New Game</button>
+      <button class="btn" onclick="resetStats()">Reset Stats</button>
+    </div>
+
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-label">Your Wins</div>
+        <div class="stat-value" id="playerWins">0</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Draws</div>
+        <div class="stat-value" id="draws">0</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">AI Wins</div>
+        <div class="stat-value" id="aiWins">0</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let board = ['','','','','','','','',''];
+    let gameActive = false;
+    let difficulty = null;
+    let stats = { playerWins: 0, aiWins: 0, draws: 0 };
+
+    const winPatterns = [
+      [0,1,2],[3,4,5],[6,7,8],
+      [0,3,6],[1,4,7],[2,5,8],
+      [0,4,8],[2,4,6]
+    ];
+
+    const difficultyLabels = {
+      easy:'Easy', medium:'Medium', hard:'Hard',
+      veryhard:'Very Hard', veryVeryHard:'Very Very Hard'
+    };
+
+    function selectDifficulty(level, btn) {
+      difficulty = level;
+      document.querySelectorAll('.difficulty-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const badge = document.getElementById('difficultyBadge');
+      badge.style.display = 'inline-block';
+      badge.textContent = difficultyLabels[level];
+      newGame();
+    }
+
+    function newGame() {
+      if (!difficulty) return;
+      board = ['','','','','','','','',''];
+      gameActive = true;
+      setStatus('Your turn (X)', '');
+      updateBoard();
+    }
+
+    function resetStats() {
+      stats = { playerWins: 0, aiWins: 0, draws: 0 };
+      updateStats();
+    }
+
+    function setStatus(text, cls) {
+      const el = document.getElementById('status');
+      el.textContent = text;
+      el.className = 'status' + (cls ? ' ' + cls : '');
+    }
+
+    function updateBoard(winningCells) {
+      const cells = document.querySelectorAll('.cell');
+      cells.forEach((cell, i) => {
+        cell.textContent = board[i];
+        cell.className = 'cell';
+        if (board[i] === 'X') cell.classList.add('x-cell', 'taken');
+        if (board[i] === 'O') cell.classList.add('o-cell', 'taken');
+        if (winningCells && winningCells.includes(i)) cell.classList.add('winning');
+      });
+    }
+
+    function getWinner() {
+      for (let p of winPatterns) {
+        const [a,b,c] = p;
+        if (board[a] && board[a]===board[b] && board[a]===board[c])
+          return { winner: board[a], cells: p };
+      }
+      return board.includes('') ? null : { winner: 'draw', cells: [] };
+    }
+
+    function playerMove(i) {
+      if (!gameActive || board[i] !== '') return;
+      board[i] = 'X';
+      updateBoard();
+      const result = getWinner();
+      if (result) { endGame(result); return; }
+      setStatus('AI is thinking...', '');
+      setTimeout(aiMove, 400);
+    }
+
+    function aiMove() {
+      if (!gameActive) return;
+      const move = getMove();
+      if (move === -1) return;
+      board[move] = 'O';
+      const result = getWinner();
+      updateBoard(result ? result.cells : null);
+      if (result) { endGame(result); return; }
+      setStatus('Your turn (X)', '');
+    }
+
+    function endGame(result) {
+      gameActive = false;
+      updateBoard(result.cells);
+      if (result.winner === 'X') {
+        setStatus('You won! Well played!', 'player-win');
+        stats.playerWins++;
+      } else if (result.winner === 'O') {
+        setStatus('AI wins! Try again.', 'ai-win');
+        stats.aiWins++;
+      } else {
+        setStatus("It's a draw!", 'draw');
+        stats.draws++;
+      }
+      updateStats();
+    }
+
+    function updateStats() {
+      document.getElementById('playerWins').textContent = stats.playerWins;
+      document.getElementById('aiWins').textContent = stats.aiWins;
+      document.getElementById('draws').textContent = stats.draws;
+    }
+
+    function getMove() {
+      if (difficulty === 'easy') return randomMove();
+      if (difficulty === 'medium') return Math.random() < 0.65 ? randomMove() : smartMove();
+      if (difficulty === 'hard') return Math.random() < 0.4 ? randomMove() : minimax(board, 0, true).index;
+      if (difficulty === 'veryhard') return Math.random() < 0.05 ? randomMove() : minimax(board, 0, true).index;
+      return minimax(board, 0, true).index;
+    }
+
+    function randomMove() {
+      const empty = board.map((v,i) => v==='' ? i : -1).filter(i => i !== -1);
+      return empty.length ? empty[Math.floor(Math.random() * empty.length)] : -1;
+    }
+
+    function smartMove() {
+      for (let [a,b,c] of winPatterns) {
+        if (board[a]==='O' && board[b]==='O' && board[c]==='') return c;
+        if (board[a]==='O' && board[b]==='' && board[c]==='O') return b;
+        if (board[a]==='' && board[b]==='O' && board[c]==='O') return a;
+      }
+      for (let [a,b,c] of winPatterns) {
+        if (board[a]==='X' && board[b]==='X' && board[c]==='') return c;
+        if (board[a]==='X' && board[b]==='' && board[c]==='X') return b;
+        if (board[a]==='' && board[b]==='X' && board[c]==='X') return a;
+      }
+      if (board[4]==='') return 4;
+      return randomMove();
+    }
+
+    function checkBoard(b) {
+      for (let [a,x,c] of winPatterns) {
+        if (b[a] && b[a]===b[x] && b[a]===b[c]) return b[a];
+      }
+      return b.includes('') ? null : 'draw';
+    }
+
+    function minimax(b, depth, isMax) {
+      const res = checkBoard(b);
+      if (res === 'O') return { score: 10 - depth };
+      if (res === 'X') return { score: depth - 10 };
+      if (res === 'draw') return { score: 0 };
+      let best = { score: isMax ? -Infinity : Infinity, index: -1 };
+      for (let i = 0; i < 9; i++) {
+        if (b[i] !== '') continue;
+        b[i] = isMax ? 'O' : 'X';
+        const s = minimax(b, depth+1, !isMax).score;
+        b[i] = '';
+        if (isMax ? s > best.score : s < best.score) best = { score: s, index: i };
+      }
+      return best;
+    }
+  </script>
+</body>
+</html>
